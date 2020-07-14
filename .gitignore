@@ -1,0 +1,9 @@
+*.vo
+*.glob
+*.aux
+*.crashcoqide
+.lia.cache
+.coqdeps.d
+CoqMakefile.conf
+makefile
+makefile.conf
