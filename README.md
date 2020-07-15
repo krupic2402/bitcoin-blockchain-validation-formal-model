@@ -1,5 +1,5 @@
 # Mechanized Formal Model of Bitcoin's Blockchain Validation Procedures
-Kristijan Rupić (kristijan.rupic@fer.hr), Lovro Rožić (lorozic33@gmail.com), and Ante Đerek (ante.derek@fer.hr)
+Kristijan Rupić (kristijan.rupic at fer.hr), Lovro Rožić (lorozic33 at gmail.com), and Ante Đerek (ante.derek at fer.hr)\
 [Faculty of Electrical Engineering and Computing, University of Zagreb](https://www.fer.unizg.hr/en)
 
 This is the Coq artifact of our paper "Mechanized Formal Model of Bitcoin's Blockchain Validation Procedures"
