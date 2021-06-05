@@ -5,6 +5,7 @@ Require Import Coq.Lists.List.
 Require Import Coq.Bool.Bool.
 Require Import Coq.ZArith.ZArith.
 Require Import Coq.Sorting.Permutation.
+Require Import Coq.micromega.Lia.
 
 
 Ltac simpls := simpl in *.
@@ -123,7 +124,7 @@ Proof.
   intros.
   rewrite <- (firstn_skipn (j + 1) l) at 2.
   rewrite nth_error_app1; auto.
-  rewrite firstn_length_le; try omega.
+  rewrite firstn_length_le; try lia.
 Qed.
 
 Lemma partition_filter: forall A (l : list A) f,
@@ -261,7 +262,7 @@ Proof.
     * intros; simpl in LEN; inversion LEN.
     * intros; destruct idx.
       - simpl in *; trivial.
-      - simpl in *; apply IHl; omega.
+      - simpl in *; apply IHl; lia.
 Qed.
 
 Lemma enumerate_list_nth: forall A idx (l : list A) p,
@@ -274,7 +275,7 @@ Proof.
     pose proof (combine_nth (seq 0 (Datatypes.length l)) l idx 0 p WW) as COMBINE.
     assert (idx = nth idx (seq 0 (Datatypes.length l)) 0).
     {
-      rewrite seq_nth. omega.
+      rewrite seq_nth. lia.
       apply nth_error_Some. congruence.
     }
     rewrite <- H0 in COMBINE; clear H0.
@@ -475,7 +476,7 @@ Proof.
       simpl.
       unfold sum in *; simpl.
       rewrite IHl.
-      omega.
+      lia.
   * intros.
     case_eq (p1 a).
     - intros.
@@ -666,7 +667,7 @@ Proof.
     auto.
   }
   intros; simpl.
-  replace (start + S len) with (S start + len) by omega.
+  replace (start + S len) with (S start + len) by lia.
   replace (seq (S start) len ++ [S start + len]) with (seq (S start) (S len)).
   auto.
   apply IHlen.
@@ -686,7 +687,7 @@ Proof.
   rewrite seq_last.
   rewrite IHlen2.
   rewrite seq_last.
-  assert (start + (len1 + len2) = start + len1 + len2) by omega.
+  assert (start + (len1 + len2) = start + len1 + len2) by lia.
   rewrite H.
   simpl.
   rewrite app_assoc.

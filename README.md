@@ -9,4 +9,4 @@ submitted to [FMBC 2020](https://fmbc.gitlab.io/2020/).
 
 Run `coq_makefile -f _CoqProject -o makefile` and then `make`.
 
-Utils.v has to be compiled before Bitcoin.v works. Checked with Coq version 8.10.2.
+Utils.v has to be compiled before Bitcoin.v works. Checked with Coq version 8.12.1.
