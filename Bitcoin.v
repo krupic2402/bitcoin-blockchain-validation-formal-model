@@ -7,6 +7,7 @@ Require Import Coq.Bool.Bool.
 Require Import Coq.ZArith.ZArith.
 Require Import Coq.Program.Basics.
 Require Import Coq.Sorting.Permutation.
+Require Import Coq.micromega.Lia.
 
 Require Import BC.Utils.
 
@@ -1003,7 +1004,7 @@ Proof.
   unfold all_outputs in *. subst output outputs.
   apply in_flat_map. exists tx0. split.
   + apply in_split_l in H. intuition.
-  + apply in_map. apply in_seq. omega.
+  + apply in_map. apply in_seq. lia.
 Qed.
 
 Lemma spent_not_unspent: forall tx_hist tx time o_i,
@@ -1022,7 +1023,7 @@ Proof.
   unfold all_outputs in *. subst output outputs.
   apply in_flat_map. exists tx0. split.
   + apply in_split_l in H. intuition.
-  + apply in_map. apply in_seq. omega.
+  + apply in_map. apply in_seq. lia.
 Qed.
 
 (** tx' is the transaction redeemed by the i-th input of tx *)
@@ -1117,7 +1118,7 @@ Proof.
   induction H_tx_hist_cons.
   + (* Trivial case. The tx_history is empty, but we are required to prove only transactions
        after the first one have redeemed predecessors. Simply show that H_i_range is impossible. *)
-    intros. rewrite TXH_EMPTY in H_i_range. simpl in H_i_range. omega.
+    intros. rewrite TXH_EMPTY in H_i_range. simpl in H_i_range. lia.
 
   + intros i H_i_range T_i time_i H_index_i prev_tx output_idx relLock input_idx H_input.
     rename tx0 into tx_last, time into time_last.
@@ -1125,14 +1126,14 @@ Proof.
 
     (* Trivial facts about list lengths *)
     assert (length (tx_hist) = (length tx_hist') + 1) as H_len_plus_1 by (eapply length_app_1; eauto).
-    assert (length tx_hist' < length (tx_hist)) as H_len_lt by omega.
+    assert (length tx_hist' < length (tx_hist)) as H_len_lt by lia.
 
     (* The tx_history was consistently updated with the last transaction. *)
 
     rename H_i_range into Hhi.
 
     (* The index i is either of a previously added transaction or the last one *)
-    assert (i < length tx_hist' \/ i = length tx_hist') as H_i_range by omega.
+    assert (i < length tx_hist' \/ i = length tx_hist') as H_i_range by lia.
 
     destruct H_i_range as [Hhi1 | Heq].
     {
@@ -1311,7 +1312,7 @@ Proof.
 
   set (len := length tx_hist').
   assert (len < length (tx_hist)) as QQ
-    by (rewrite BAPP; rewrite app_length; simpl; omega).
+    by (rewrite BAPP; rewrite app_length; simpl; lia).
 
   assert (Some (tx0, time) = nth_error (tx_hist) len) as QQQ.
   {
@@ -1481,10 +1482,10 @@ Proof.
   inversion H_prefix_j.
   { rewrite TXH_EMPTY in H4. symmetry in H4. apply nth_error_In in H4. inversion H4. }
   rename tx0 into T_j', time into time_j'.
-  simpl in TXH_APPEND. assert ((j + 1) <= length (tx_hist)) by omega.
+  simpl in TXH_APPEND. assert ((j + 1) <= length (tx_hist)) by lia.
   pose proof (firstn_length_le (tx_hist) H7).
   assert (length (firstn (j + 1) (tx_hist)) = (length tx_hist') + 1) as H_len_plus_1 by (eapply length_app_1; eauto).
-  assert (j = length tx_hist') by omega. clear H_len_plus_1.
+  assert (j = length tx_hist') by lia. clear H_len_plus_1.
   remember (firstn (j + 1) (tx_hist)) as prefix_j.
   pose proof (list_last prefix_j tx_hist' j (T_j, time_j) (T_j', time_j') H9 H4 TXH_APPEND).
   symmetry in H10. inversion H10. clear H9. subst. clear H7 H8 H10.
@@ -1495,10 +1496,10 @@ Proof.
   inversion H_prefix_i.
   { simpl in *. rewrite TXH_EMPTY in H3. symmetry in H3. apply nth_error_In in H3. inversion H3. }
   rename tx0 into T_i', time into time_i'.
-  simpl in TXH_APPEND. assert ((i + 1) <= length (tx_hist)) by omega.
+  simpl in TXH_APPEND. assert ((i + 1) <= length (tx_hist)) by lia.
   pose proof (firstn_length_le (tx_hist) H7).
   assert (length (firstn (i + 1) (tx_hist)) = (length tx_hist') + 1) as H_len_plus_1 by (eapply length_app_1; eauto).
-  assert (i = length tx_hist') by omega. clear H_len_plus_1.
+  assert (i = length tx_hist') by lia. clear H_len_plus_1.
   remember (firstn (i + 1) (tx_hist)) as prefix_i.
   pose proof (list_last prefix_i tx_hist' i (T_i, time_i) (T_i', time_i') H9 H3 TXH_APPEND).
   symmetry in H10. inversion H10. clear H9. subst. clear H7 H8 H10.
@@ -1549,8 +1550,8 @@ Proof.
   pose proof (exists_preceding_output) as H_output.
   specialize (H_output (tx_hist_prefix_to i tx_hist) i H_prefix_i).
   pose proof (@firstn_length_le _ (tx_hist) (i + 1)).
-  assert (length (firstn (i + 1) (tx_hist)) = i + 1) as H_length by omega.
-  assert (i < length (firstn (i + 1) (tx_hist))) by omega.
+  assert (length (firstn (i + 1) (tx_hist)) = i + 1) as H_length by lia.
+  assert (i < length (firstn (i + 1) (tx_hist))) by lia.
   specialize (H_output H6 T_i time_i H3). clear H5 H6.
   destruct input_i as [p relLock_input_i]. destruct p as [T' T'_o_i].
   specialize (H_output T' T'_o_i relLock_input_i).
@@ -1573,7 +1574,7 @@ Proof.
   simpl in H_T_k_in_tx_hist.
   apply length_app_1 in TXH_APPEND_i as H_tx_hist'_i_length.
   rewrite H_length in H_tx_hist'_i_length.
-  assert (length (tx_hist'_i) = i) as Heq_i by omega.
+  assert (length (tx_hist'_i) = i) as Heq_i by lia.
   rewrite <- Heq_i in H_k_lt_i.
   unfold tx_hist_prefix_to in *.
   rewrite TXH_APPEND_i in H_T_k_in_tx_hist.
@@ -1598,13 +1599,13 @@ Proof.
     assert (firstn (j + 1) (tx_hist) = firstn (j + 1) (tx_hist'_i)).
     {
       pose proof (firstn_firstn (tx_hist) (j + 1) (i + 1)).
-      simpl in H7. rewrite min_l in H7; try omega. rewrite TXH_APPEND_i in H7.
+      simpl in H7. rewrite min_l in H7; try lia. rewrite TXH_APPEND_i in H7.
       rewrite <- H7. rewrite firstn_app.
 
       assert (length (firstn (i + 1) (tx_hist)) = length (tx_hist'_i) + 1) by (eapply length_app_1; eauto).
-      assert (length (firstn (i + 1) (tx_hist)) = i + 1) by (apply firstn_length_le; omega).
-      assert (length (tx_hist'_i) = i) by omega. rewrite H11.
-      assert (j + 1 - i = 0) by omega. rewrite H12. simpl. intuition.
+      assert (length (firstn (i + 1) (tx_hist)) = i + 1) by (apply firstn_length_le; lia).
+      assert (length (tx_hist'_i) = i) by lia. rewrite H11.
+      assert (j + 1 - i = 0) by lia. rewrite H12. simpl. intuition.
     }
 
     rewrite H7. apply firstn_prefix.
@@ -1628,7 +1629,7 @@ Proof.
   intros.
   apply nth_error_In in H4 as H_In_ith.
   apply nth_error_In in H5 as H_In_jth.
-  assert (j < i \/ i < j \/ i = j) by (omega).
+  assert (j < i \/ i < j \/ i = j) by (lia).
   decompose [or] H7.
   apply (no_double_spending_distinct tx_hist H i j T_i time_i T_j time_j); auto.
 
@@ -1643,7 +1644,7 @@ Proof.
   }
   {
     apply length_app_1 in TXH_APPEND as Hlen. rewrite Hlen in *.
-    assert (j < Datatypes.length tx_hist' \/ j = Datatypes.length tx_hist') by omega.
+    assert (j < Datatypes.length tx_hist' \/ j = Datatypes.length tx_hist') by lia.
     destruct H2.
     + apply IHtx_history_consistent; auto.
       rewrite TXH_APPEND in H3. rewrite nth_error_app1 in H3; auto.
@@ -1775,23 +1776,23 @@ Proof.
   unfold tx_hist_prefix_to in *; rewrite <- nth_error_firstn, firstn_map in H2', H3'; auto.
 
   assert (i + 1 = Datatypes.length (firstn (i + 1) (map proj tx_hist))) as H_i1
-  by (rewrite firstn_length_le; auto; omega);
+  by (rewrite firstn_length_le; auto; lia);
   apply (f_equal (map proj)) in TXH_APPEND; rewrite <- firstn_map, map_app in TXH_APPEND;
   assert (i = Datatypes.length (map proj tx_hist')) as H_i by
-  (rewrite TXH_APPEND, app_length in *; simpl in *; omega);
+  (rewrite TXH_APPEND, app_length in *; simpl in *; lia);
   rewrite firstn_map in TXH_APPEND;
   pose proof (list_last _ _ _ _ _ H_i H2' TXH_APPEND) as H_T1; inversion H_T1; clear H_T1 H_i H2'.
 
   assert (j + 1 = Datatypes.length (firstn (j + 1) (map proj tx_hist))) as H_j1
-  by (rewrite firstn_length_le; auto; omega);
+  by (rewrite firstn_length_le; auto; lia);
   apply (f_equal (map proj)) in TXH_APPEND0; rewrite <- firstn_map, map_app in TXH_APPEND0;
   assert (j = Datatypes.length (map proj tx_hist'0)) as H_j by
-  (rewrite TXH_APPEND0, app_length in *; simpl in *; omega);
+  (rewrite TXH_APPEND0, app_length in *; simpl in *; lia);
   rewrite firstn_map in TXH_APPEND0;
   pose proof (list_last _ _ _ _ _ H_j H3' TXH_APPEND0) as H_T2; inversion H_T2; clear H_T2 H_j H3'.
 
   subst proj. simpl in H5, H6.
-  assert (i = j \/ j < i \/ i < j) as H_cases by omega; destruct H_cases; auto; exfalso.
+  assert (i = j \/ j < i \/ i < j) as H_cases by lia; destruct H_cases; auto; exfalso.
 
   destruct TXH_UPDATE  as [[bh1 [outputs1 [H_coin1 [_ H_uniq1]]]] | [_ [_ [H_inputs1 _]]]];
   destruct TXH_UPDATE0 as [[bh2 [outputs2 [H_coin2 [_ H_uniq2]]]] | [_ [_ [H_inputs2 _]]]];
@@ -1809,19 +1810,19 @@ Proof.
       apply firstn_app_one in TXH_APPEND; auto;
       replace (j + 1) with (min (j + 1) i); [
         rewrite <- firstn_firstn; rewrite TXH_APPEND; apply firstn_prefix |
-        rewrite min_l; omega ]);
+        rewrite min_l; lia ]);
       destruct X as [suff]; rewrite <- e in *.
 
       pose proof coinbase_height'_monotone as H;
       specialize (H (map proj tx_hist'0 ++ [T_j]) suff) as H_above;
       specialize (H (map proj tx_hist'0) [T_j]) as H_below;
-      assert (coinbase_height' (map proj tx_hist'0) = coinbase_height' (map proj tx_hist'0 ++ [T_j])) as H_false by omega;
+      assert (coinbase_height' (map proj tx_hist'0) = coinbase_height' (map proj tx_hist'0 ++ [T_j])) as H_false by lia;
       clear - H_false H_coin2.
 
       subst;
       unfold coinbase_height' in H_false;
       rewrite fold_left_app in H_false;
-      fold (coinbase_height' (map proj tx_hist'0)) in H_false; simpl in H_false; omega.
+      fold (coinbase_height' (map proj tx_hist'0)) in H_false; simpl in H_false; lia.
 
     - rewrite <- H4 in *; clear H4;
       rewrite H_coin1 in H_coin2; inversion H_coin2; clear - H0 H1 H5 H6 TXH_APPEND TXH_APPEND0 H_coin1 H_uniq1 H_uniq2.
@@ -1832,19 +1833,19 @@ Proof.
       apply firstn_app_one in TXH_APPEND0; auto;
       replace (i + 1) with (min (i + 1) j); [
         rewrite <- firstn_firstn; rewrite TXH_APPEND0; apply firstn_prefix |
-        rewrite min_l; omega ]);
+        rewrite min_l; lia ]);
       destruct X as [suff]; rewrite <- e in *.
 
       pose proof coinbase_height'_monotone as H;
       specialize (H (map proj tx_hist' ++ [T_i]) suff) as H_above;
       specialize (H (map proj tx_hist') [T_i]) as H_below;
-      assert (coinbase_height' (map proj tx_hist') = coinbase_height' (map proj tx_hist' ++ [T_i])) as H_false by omega;
+      assert (coinbase_height' (map proj tx_hist') = coinbase_height' (map proj tx_hist' ++ [T_i])) as H_false by lia;
       clear - H_false H_coin1.
 
       subst;
       unfold coinbase_height' in H_false;
       rewrite fold_left_app in H_false;
-      fold (coinbase_height' (map proj tx_hist')) in H_false; simpl in H_false; omega.
+      fold (coinbase_height' (map proj tx_hist')) in H_false; simpl in H_false; lia.
   }
   {
     subst;
@@ -1986,12 +1987,12 @@ Proof.
       apply In_nth_error in H0.
       destruct H0 as [i]. symmetry in H0.
       assert (nth_error tx_hist' i <> None) as Hyp by congruence; apply nth_error_Some in Hyp.
-      assert (i < Datatypes.length (tx_hist' ++ [(tx, time)])) by (rewrite app_length; omega).
+      assert (i < Datatypes.length (tx_hist' ++ [(tx, time)])) by (rewrite app_length; lia).
 
       destruct (transaction_uniqueness _ H_consistent i (length tx_hist') tx' time' tx time); auto; [
-      rewrite app_length; simpl; omega |
+      rewrite app_length; simpl; lia |
       rewrite nth_error_app1; auto |
-      rewrite nth_error_app2; auto; rewrite minus_diag; auto | omega].
+      rewrite nth_error_app2; auto; rewrite minus_diag; auto | lia].
     }
     {
       apply in_app_or in H0.
@@ -2021,7 +2022,7 @@ Proof.
         apply In_nth_error in H0.
         destruct H0 as [i]. symmetry in H0.
         assert (nth_error tx_hist' i <> None) as Hyp by congruence; apply nth_error_Some in Hyp.
-        assert (i < Datatypes.length (tx_hist' ++ [(tx, time)])) by (rewrite app_length; omega).
+        assert (i < Datatypes.length (tx_hist' ++ [(tx, time)])) by (rewrite app_length; lia).
         assert (Some (tx', time') = nth_error (tx_hist' ++ [(tx, time)]) i) by (rewrite nth_error_app1; auto).
 
         destruct (exists_preceding_output _ _ H_consistent H4 _ _ H5 _ _ _ _ H1)
@@ -2029,8 +2030,8 @@ Proof.
 
         destruct (transaction_uniqueness _ H_consistent j (length tx_hist') T_j time_j tx time); auto; [
         apply nth_error_Some; congruence |
-        rewrite app_length; simpl; omega |
-        rewrite nth_error_app2; auto; rewrite minus_diag; auto | omega].
+        rewrite app_length; simpl; lia |
+        rewrite nth_error_app2; auto; rewrite minus_diag; auto | lia].
       }
       {
         simpl in H0; destruct H0; intuition; subst; simpl;
@@ -2335,7 +2336,7 @@ Proof.
                                      end)).
       * symmetry.
         unfold Satoshi, Index, Time in *.
-        erewrite fold_left_sum_map with (g:=snd); try (ins; omega).
+        erewrite fold_left_sum_map with (g:=snd); try (ins; lia).
         assert ((map snd (outputs (stub tx0))) = (map
         (fun a : TxStub * Index =>
         let (tx1, output_idx) := a in match nth_error (outputs tx1) output_idx with
@@ -2446,7 +2447,7 @@ Proof.
     erewrite <- H1; clear H1 H0.
     rewrite filter_sum_true_total_minus_false2 with (p2:= fun x : TxStub * nat => negb (output_spent tx_hist x)).
     apply MNS; split; clear MNS; ins.
-    ** erewrite fold_left_sum_map with (g:=get_input_value); try (ins; omega).
+    ** erewrite fold_left_sum_map with (g:=get_input_value); try (ins; lia).
        rewrite <- sum_fold_equiv.
        assert(QQQ: Permutation
        (filter (fun a : TxStub * nat =>
@@ -2751,10 +2752,10 @@ Proof.
 
       destruct TXH_UPDATE as [[bh [outputs [H_coin _]]] | [H_value [_ [H_inputs _]]]].
       * destruct tx0; simpl in *; subst.
-        rewrite utxo_value_append; auto; simpl; unfold sum_inputs; omega.
+        rewrite utxo_value_append; auto; simpl; unfold sum_inputs; lia.
       * destruct tx0 as [[] ?]; try contradiction; simpl in *.
         rewrite utxo_value_append; auto; simpl;
-        unfold nonincreasing_value in *; omega.
+        unfold nonincreasing_value in *; lia.
 Qed.
 
 (** Theorem: in a consistent transaction history, the sum of a transaction's inputs is bounded above
@@ -2867,7 +2868,7 @@ Proof.
           apply nth_error_Some. congruence.
         - intros. destruct IH as [_ IH]. specialize (IH i).
           rewrite app_length in H; simpl in H;
-          assert (0 < i < length transactions \/ i = length transactions) by omega; clear H; destruct H0.
+          assert (0 < i < length transactions \/ i = length transactions) by lia; clear H; destruct H0.
           + specialize (IH H). destruct IH as [inputs' [outputs' [abslock' IH]]].
             exists inputs', outputs', abslock'.
             rewrite nth_error_app1; intuition.
@@ -2878,7 +2879,7 @@ Proof.
         destruct IH as [[bh' [outputs' H_nonempty]] _].
         intros [_ H]. specialize (H (length transactions)).
         destruct H as [inputs'' [outputs'' [abslock'' H]]].
-        - rewrite app_length; simpl; split; [ apply nth_error_Some; congruence | omega ].
+        - rewrite app_length; simpl; split; [ apply nth_error_Some; congruence | lia ].
         - rewrite nth_error_app2 in H; auto. rewrite minus_diag in H. simpl in H. congruence.
       }
     }
@@ -2889,7 +2890,7 @@ Proof.
         - right; intros [[? [? H]] _]; simpl in H; congruence.
         - left.
           + split. exists bh, outputs. auto. simpl.
-            intros. omega.
+            intros. lia.
       }
       {
         right. intro. apply IH; clear IH. unfold only_first_tx_coinbase in *. split.
@@ -2898,7 +2899,7 @@ Proof.
           rewrite nth_error_app1 in H; [ assumption | simpl; intuition ].
         - intros. destruct H as [_ H]. specialize (H i).
           destruct H as [inputs [outputs [abslock H]]].
-          rewrite app_comm_cons; rewrite app_length; omega.
+          rewrite app_comm_cons; rewrite app_length; lia.
           exists inputs, outputs, abslock.
           rewrite app_comm_cons in H;
           rewrite nth_error_app1 in H; [ assumption | intuition ].
@@ -2977,7 +2978,7 @@ Proof.
     2 : {
       intros.
       rewrite app_length in H_rest_tx; simpl in H_rest_tx; rewrite Nat.add_1_r in H_rest_tx.
-      assert (0 < i < S (S (Datatypes.length rest))) by omega.
+      assert (0 < i < S (S (Datatypes.length rest))) by lia.
       specialize (H_rest_tx i H1). clear H1.
       destruct H_rest_tx as [inputs' [outputs' [abslock' H_tx]]].
       do 3 (unshelve eexists; eauto).
@@ -2986,8 +2987,8 @@ Proof.
     {
       rewrite app_length in H_rest_tx; simpl in H_rest_tx; rewrite Nat.add_1_r in H_rest_tx.
       specialize (H_rest_tx (S (Datatypes.length rest))).
-      destruct H_rest_tx as [inputs' [outputs' [abslock' H_tx]]]; [omega |].
-      rewrite app_comm_cons in H_tx; rewrite nth_error_app2 in H_tx; simpl in *; [| omega].
+      destruct H_rest_tx as [inputs' [outputs' [abslock' H_tx]]]; [lia |].
+      rewrite app_comm_cons in H_tx; rewrite nth_error_app2 in H_tx; simpl in *; [| lia].
       rewrite minus_diag in H_tx; simpl in H_tx; inversion H_tx.
 
       rewrite combine_distrib; auto.
@@ -3061,10 +3062,10 @@ Proof.
   rewrite <- (nth_error_firstn i (tx_hist) H3) in H0.
   inversion H2.
   { simpl in *. rewrite TXH_EMPTY in *. apply nth_error_In in H0. inversion H0. }
-  assert ((i + 1) <= length (tx_hist)) as Hi1 by omega.
+  assert ((i + 1) <= length (tx_hist)) as Hi1 by lia.
   epose proof (firstn_length_le (tx_hist) Hi1).
   assert (length (firstn (i + 1) (tx_hist)) = (length tx_hist') + 1) as H_len_plus_1 by (eapply length_app_1; eauto).
-  assert (i = length tx_hist') as Hi by omega. clear H_len_plus_1.
+  assert (i = length tx_hist') as Hi by lia. clear H_len_plus_1.
   remember (firstn (i + 1) (tx_hist)) as prefix_i.
   pose proof (list_last prefix_i tx_hist' i (tx0, time) (tx1, time0) Hi (eq_sym H0) TXH_APPEND) as H_eq.
   inversion H_eq; subst tx1 time; clear H_eq.
@@ -3118,14 +3119,14 @@ Proof.
     rewrite !map_app. simpl. rewrite IHtransactions0.
     destruct (H2 (Datatypes.length (transactions0 ++ [x])))
     as [inputs' [outputs' [al' H_tx]]];
-    [rewrite !app_length; simpl; omega |].
+    [rewrite !app_length; simpl; lia |].
     rewrite app_length, app_comm_cons, nth_error_app2,
     Nat.add_1_r, minus_diag in H_tx; simpl in H_tx; inversion_clear H_tx.
     auto.
-    simpl; omega.
+    simpl; lia.
 
     clear - H2. intros. rewrite app_length, Nat.add_1_r in H2.
-    destruct (H2 i) as [inputs' [outputs' [al' H_tx]]]; [omega |].
+    destruct (H2 i) as [inputs' [outputs' [al' H_tx]]]; [lia |].
     exists inputs', outputs', al'.
     rewrite app_comm_cons, nth_error_app1 in H_tx; simpl in *; intuition.
   }
@@ -3219,7 +3220,7 @@ Proof.
   clear - H H_witnesses.
   intros.
   generalize dependent witnesses1.
-  induction transactions0 using rev_ind; intros; simpl; try omega.
+  induction transactions0 using rev_ind; intros; simpl; try lia.
   induction witnesses1 using rev_ind; simpl; auto.
   rewrite !app_length in H_witnesses; simpl in H_witnesses; intuition.
   rewrite !app_length in H_witnesses; simpl in H_witnesses; clear IHwitnesses1.
@@ -3243,5 +3244,5 @@ Proof.
     intuition.
   }
   subst c d.
-  omega.
+  lia.
 Qed.
